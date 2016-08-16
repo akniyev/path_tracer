@@ -25,6 +25,34 @@ parentGroups = []
 groups = []
 groupCenters = []
 
+def breakIntoComponents2(coords):
+    sa = set(coords)
+
+    def removeOne(s, x, y):
+        if (x,y) in s:
+            s.remove((x, y))
+            return [(x, y)] \
+                   + removeOne(s, x - 1, y - 1) \
+                   + removeOne(s, x, y-1) \
+                   + removeOne(s, x + 1, y - 1) \
+                   + removeOne(s, x + 1, y) \
+                   + removeOne(s, x + 1, y + 1) \
+                   + removeOne(s, x, y + 1) \
+                   + removeOne(s, x - 1, y + 1) \
+                   + removeOne(s, x - 1, y)
+        else:
+            return []
+
+    result = []
+
+    for i in coords:
+        ro = removeOne(sa, i[0], i[1])
+        if (ro != []):
+            result.append(ro)
+
+    return result
+
+
 def breakIntoComponents(a):
     if (len(colors) == 0 or len(a) == 0):
         return []
@@ -42,9 +70,17 @@ def breakIntoComponents(a):
         canvas[x][y] = 2
         component.append((x, y))
 
+        newcomp = []
+
         while True:
+            compForArray = []
+            if (newcomp != []):
+                compForArray = newcomp
+            else:
+                compForArray = component
+
             newcomp = []
-            for i in component:
+            for i in compForArray:
                 xx = i[0]
                 yy = i[1]
                 if (canvas[xx+1][yy] == 1):
@@ -89,43 +125,6 @@ def breakIntoComponents(a):
         if r != []:
             result.append(r)
     return result
-
-# def breakIntoComponents(a):
-#     def tearOneComponent(a, component=[]):
-#         if component == []:
-#             component = [a[0]]
-#             del a[0]
-#             return tearOneComponent(a, component)
-#
-#         newels = []
-#
-#         for el in component:
-#             el_tr = (el[0] + 1, el[1] - 1)
-#             el_br = (el[0] + 1, el[1] + 1)
-#             el_tl = (el[0] - 1, el[1] - 1)
-#             el_bl = (el[0] - 1, el[1] + 1)
-#
-#             el_r = (el[0] + 1, el[1])
-#             el_l = (el[0] - 1, el[1])
-#             el_t = (el[0], el[1] - 1)
-#             el_b = (el[0], el[1] + 1)
-#
-#             for i in [el_tr, el_br, el_tl, el_bl, el_r, el_l, el_t, el_b]:
-#                 if i in a:
-#                     a.remove(i)
-#                     compo
-#
-#     if (a == []):
-#         return []
-#     result = []
-#     current = [a[0]]
-#
-#     del a[0]
-#
-#     while a.count() > 0:
-#         newa = []
-#         for i in a:
-#             if
 
 def traceImage(imgPath):
     im = Image.open(imgPath)
@@ -204,7 +203,8 @@ def traceImage(imgPath):
                 newElements.append((x - 1, y + 1))
                 colors[x - 1][y + 1] = 2
 
-        components = breakIntoComponents(newElements)
+        components = breakIntoComponents2(newElements)
+        # components = breakIntoComponents(newElements)
 
         for c in components:
             gid = getGroupId()
@@ -251,9 +251,9 @@ if __name__ == '__main__':
 
     pic.setGeometry(10, 30, 255, 255)
 
-    im = Image.open('cracks.png')
+    im = Image.open('cracks2.png')
 
-    traceImage('cracks.png')
+    traceImage('cracks2.png')
     #
     # im_sharp = im.filter(ImageFilter.CONTOUR)
     #
